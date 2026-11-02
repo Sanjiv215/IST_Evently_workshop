@@ -3,16 +3,10 @@ export default async function handler(req, res) {
     process.env.BACKEND_URL ||
     process.env.RENDER_BACKEND_URL ||
     process.env.RENDER_URL ||
-    ""
+    "https://ist-evently-workshop.onrender.com"
   ).replace(/\/+$/, "");
 
-  if (!backendBase) {
-    return res.status(500).json({
-      error: "BACKEND_URL is not set. Add BACKEND_URL in Vercel Project Settings -> Environment Variables."
-    });
-  }
-
-  // Preserve request path and query string
+  // Preserve request path and query parameters
   const requestPath = req.url || "";
   const targetUrl = `${backendBase}${requestPath.startsWith("/") ? "" : "/"}${requestPath}`;
 
