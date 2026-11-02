@@ -1,11 +1,13 @@
 import os
 from flask import Flask, jsonify, request, render_template
+from flask_cors import CORS
 from supabase import create_client, Client, PostgrestAPIError
 from dotenv import load_dotenv
 
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}}, allow_headers=["Content-Type", "Authorization", "X-User-Id", "Accept"])
 
 supabase: Client = create_client(
     os.environ.get("SUPABASE_URL"),
@@ -38,6 +40,11 @@ def get_user_id():
         or (request.json.get("user_id") if request.is_json and request.json else None)
         or DEFAULT_USER_ID
     )
+
+
+@app.route("/health")
+def health():
+    return jsonify({"status": "healthy"}), 200
 
 
 @app.route("/")

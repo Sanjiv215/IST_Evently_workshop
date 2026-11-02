@@ -20,11 +20,7 @@
             --radius: 10px;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -36,7 +32,6 @@
             flex-direction: column;
         }
 
-        /* Top Navbar */
         header {
             background-color: var(--surface);
             border-bottom: 1px solid var(--border);
@@ -93,10 +88,7 @@
             cursor: pointer;
         }
 
-        .nav-links {
-            display: flex;
-            gap: 10px;
-        }
+        .nav-links { display: flex; gap: 10px; }
 
         .tab-btn {
             background: transparent;
@@ -110,15 +102,8 @@
             transition: all 0.15s ease;
         }
 
-        .tab-btn:hover {
-            color: var(--text-main);
-            background: var(--surface-hover);
-        }
-
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
-        }
+        .tab-btn:hover { color: var(--text-main); background: var(--surface-hover); }
+        .tab-btn.active { background: var(--primary); color: white; }
 
         .docs-link {
             color: #38bdf8;
@@ -133,11 +118,8 @@
             background: rgba(2, 132, 199, 0.1);
         }
 
-        .docs-link:hover {
-            background: rgba(2, 132, 199, 0.2);
-        }
+        .docs-link:hover { background: rgba(2, 132, 199, 0.2); }
 
-        /* Main Container */
         main {
             max-width: 1200px;
             margin: 24px auto;
@@ -146,7 +128,6 @@
             width: 100%;
         }
 
-        /* Banner & Alerts */
         .toast {
             position: fixed;
             bottom: 24px;
@@ -169,7 +150,6 @@
         .toast-success { background: var(--success); color: white; }
         .toast-error { background: var(--danger); color: white; }
 
-        /* Grid Layout */
         .section-header {
             margin-bottom: 20px;
             display: flex;
@@ -177,11 +157,7 @@
             align-items: center;
         }
 
-        .section-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
+        .section-title { font-size: 22px; font-weight: 700; color: var(--text-main); }
 
         .events-grid {
             display: grid;
@@ -189,7 +165,6 @@
             gap: 20px;
         }
 
-        /* Event Card */
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -201,14 +176,8 @@
             transition: transform 0.15s ease, border-color 0.15s ease;
         }
 
-        .card:hover {
-            transform: translateY(-2px);
-            border-color: #3b82f6;
-        }
-
-        .card-top {
-            margin-bottom: 16px;
-        }
+        .card:hover { transform: translateY(-2px); border-color: #3b82f6; }
+        .card-top { margin-bottom: 16px; }
 
         .card-tag {
             display: inline-block;
@@ -223,12 +192,7 @@
             letter-spacing: 0.5px;
         }
 
-        .card-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 8px;
-        }
+        .card-title { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
 
         .card-meta {
             font-size: 13px;
@@ -259,14 +223,8 @@
             text-decoration: none;
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-hover);
-        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
 
         .btn-secondary {
             background: #1e293b;
@@ -274,9 +232,7 @@
             border: 1px solid var(--border);
         }
 
-        .btn-secondary:hover {
-            background: var(--surface-hover);
-        }
+        .btn-secondary:hover { background: var(--surface-hover); }
 
         .btn-registered {
             background: rgba(16, 185, 129, 0.15);
@@ -285,7 +241,6 @@
             cursor: default;
         }
 
-        /* Modal */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -318,10 +273,7 @@
             align-items: center;
         }
 
-        .modal-title {
-            font-size: 18px;
-            font-weight: 700;
-        }
+        .modal-title { font-size: 18px; font-weight: 700; }
 
         .close-btn {
             background: transparent;
@@ -331,14 +283,8 @@
             cursor: pointer;
         }
 
-        .close-btn:hover {
-            color: var(--text-main);
-        }
-
-        .modal-body {
-            padding: 20px;
-            overflow-y: auto;
-        }
+        .close-btn:hover { color: var(--text-main); }
+        .modal-body { padding: 20px; overflow-y: auto; }
 
         .attendee-item {
             padding: 10px 14px;
@@ -351,24 +297,10 @@
             align-items: center;
         }
 
-        .attendee-email {
-            font-size: 14px;
-            font-weight: 600;
-        }
+        .attendee-email { font-size: 14px; font-weight: 600; }
+        .attendee-id { font-size: 12px; color: var(--text-muted); font-family: monospace; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
 
-        .attendee-id {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-family: monospace;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-        }
-
-        /* Footer */
         footer {
             border-top: 1px solid var(--border);
             padding: 20px;
@@ -382,7 +314,6 @@
 </head>
 <body>
 
-    <!-- Header Navigation -->
     <header>
         <div class="nav-container">
             <a href="/" class="brand">
@@ -418,9 +349,7 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main>
-        <!-- Tab 1: Browse Events -->
         <section id="eventsSection">
             <div class="section-header">
                 <h2 class="section-title">Available Events</h2>
@@ -431,7 +360,6 @@
             </div>
         </section>
 
-        <!-- Tab 2: My Registrations -->
         <section id="myRegsSection" style="display:none;">
             <div class="section-header">
                 <h2 class="section-title">My Registered Events</h2>
@@ -443,7 +371,6 @@
         </section>
     </main>
 
-    <!-- Attendee List Modal -->
     <div class="modal-overlay" id="attendeeModal" onclick="closeModalOnBg(event)">
         <div class="modal">
             <div class="modal-header">
@@ -456,12 +383,10 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
 
-    <!-- Footer -->
     <footer>
-        <p>&copy; 2026 EventHub &bull; Production Ready Flask + Supabase API & Frontend</p>
+        <p>&copy; 2026 EventHub &bull; Production Ready: Vercel Frontend + Render Backend + Supabase</p>
     </footer>
 
     <script>
@@ -473,9 +398,7 @@
             toast.textContent = message;
             toast.className = 'toast ' + (isError ? 'toast-error' : 'toast-success');
             toast.style.display = 'block';
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, 3500);
+            setTimeout(() => { toast.style.display = 'none'; }, 3500);
         }
 
         function changeActiveUser() {
@@ -555,7 +478,6 @@
 
         async function loadEvents() {
             try {
-                // Ensure my registration cache is fresh
                 await loadMyRegistrations(false);
 
                 const res = await fetch('/api/events');
@@ -661,15 +583,8 @@
             }
         }
 
-        function closeAttendeeModal() {
-            document.getElementById('attendeeModal').style.display = 'none';
-        }
-
-        function closeModalOnBg(e) {
-            if (e.target.id === 'attendeeModal') {
-                closeAttendeeModal();
-            }
-        }
+        function closeAttendeeModal() { document.getElementById('attendeeModal').style.display = 'none'; }
+        function closeModalOnBg(e) { if (e.target.id === 'attendeeModal') closeAttendeeModal(); }
 
         function escapeHtml(str) {
             if (!str) return '';
@@ -681,10 +596,7 @@
                 .replace(/'/g, "&#039;");
         }
 
-        // Initialize on load
-        window.addEventListener('DOMContentLoaded', () => {
-            loadEvents();
-        });
+        window.addEventListener('DOMContentLoaded', () => { loadEvents(); });
     </script>
 </body>
 </html>

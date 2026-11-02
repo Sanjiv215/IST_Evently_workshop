@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventHub &bull; Event Registration Platform</title>
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --bg: #0b0f19;
+            --surface: #151e2e;
+            --surface-hover: #1c273c;
+            --border: #243248;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius: 10px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Backend Banner */
+        .backend-banner {
+            background: #1e3a8a;
+            color: #dbeafe;
+            padding: 10px 20px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #3b82f6;
+        }
+
+        .backend-banner input {
+            background: #0f172a;
+            color: white;
+            border: 1px solid #3b82f6;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            width: 320px;
+            outline: none;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 20px;
+            color: #60a5fa;
+            text-decoration: none;
+        }
+
+        .user-selector-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #0f172a;
+            padding: 6px 12px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        .user-selector-bar label {
+            font-size: 13px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        select {
+            background: #1e293b;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid transparent;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.15s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: var(--surface-hover);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .docs-link {
+            color: #38bdf8;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #0369a1;
+            background: rgba(2, 132, 199, 0.1);
+        }
+
+        .docs-link:hover {
+            background: rgba(2, 132, 199, 0.2);
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 20px;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* Alerts & Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.2s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .toast-success { background: var(--success); color: white; }
+        .toast-error { background: var(--danger); color: white; }
+
+        /* Grid Layout */
+        .section-header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+
+        /* Event Card */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: #3b82f6;
+        }
+
+        .card-top { margin-bottom: 16px; }
+
+        .card-tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .card-meta {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn {
+            flex: 1;
+            padding: 9px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s ease;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+
+        .btn-secondary {
+            background: #1e293b;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover { background: var(--surface-hover); }
+
+        .btn-registered {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid #059669;
+            cursor: default;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 200;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            max-width: 600px;
+            width: 100%;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title { font-size: 18px; font-weight: 700; }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .close-btn:hover { color: var(--text-main); }
+
+        .modal-body { padding: 20px; overflow-y: auto; }
+
+        .attendee-item {
+            padding: 10px 14px;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .attendee-email { font-size: 14px; font-weight: 600; }
+        .attendee-id { font-size: 12px; color: var(--text-muted); font-family: monospace; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            background: var(--surface);
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Backend Configuration Bar (Active on Vercel) -->
+    <div class="backend-banner" id="backendConfigBar">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span>🌐 <strong>Render Backend API:</strong></span>
+            <input type="text" id="backendInput" placeholder="https://your-backend.onrender.com">
+            <button class="btn btn-primary" onclick="saveBackendUrl()" style="flex:none; padding:4px 12px; font-size:12px;">Save & Connect</button>
+        </div>
+        <span id="backendStatus" style="font-size:12px; opacity:0.8;"></span>
+    </div>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="nav-container">
+            <a href="/" class="brand">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                EventHub
+            </a>
+
+            <div class="user-selector-bar">
+                <label for="userSelect">Active User:</label>
+                <select id="userSelect" onchange="changeActiveUser()">
+                    <option value="7f2e9b9e-d9d8-4712-b6c3-6d2293a73c2a">Hemant Sharma (Student)</option>
+                    <option value="a1a1a1a1-1111-4111-8111-111111111111">Alice Johnson (Student)</option>
+                    <option value="b2b2b2b2-2222-4222-8222-222222222222">Bob Smith (Student)</option>
+                    <option value="c3c3c3c3-3333-4333-8333-333333333333">Charlie Brown (Student)</option>
+                    <option value="d4d4d4d4-4444-4444-8444-444444444444">Diana Prince (Student)</option>
+                    <option value="00eeafd0-1883-4a3f-be54-c54db75b826a">Organizer 1 (acid.rollback.demo)</option>
+                    <option value="e5e5e5e5-5555-4555-8555-555555555555">Organizer 2 (sarah.connor)</option>
+                </select>
+            </div>
+
+            <div class="nav-links">
+                <button class="tab-btn active" id="tabEvents" onclick="switchTab('events')">Browse Events</button>
+                <button class="tab-btn" id="tabMyRegs" onclick="switchTab('my-regs')">My Registrations</button>
+                <a id="docsLink" href="/docs" class="docs-link" target="_blank">
+                    API Docs &rarr;
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Tab 1: Browse Events -->
+        <section id="eventsSection">
+            <div class="section-header">
+                <h2 class="section-title">Available Events</h2>
+                <button class="btn btn-secondary" onclick="loadEvents()" style="flex:none;">Refresh Events</button>
+            </div>
+            <div class="events-grid" id="eventsGrid">
+                <div class="empty-state">Loading events...</div>
+            </div>
+        </section>
+
+        <!-- Tab 2: My Registrations -->
+        <section id="myRegsSection" style="display:none;">
+            <div class="section-header">
+                <h2 class="section-title">My Registered Events</h2>
+                <button class="btn btn-secondary" onclick="loadMyRegistrations()" style="flex:none;">Refresh List</button>
+            </div>
+            <div class="events-grid" id="myRegsGrid">
+                <div class="empty-state">Loading registrations...</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Attendee List Modal -->
+    <div class="modal-overlay" id="attendeeModal" onclick="closeModalOnBg(event)">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalEventTitle">Event Attendees</h3>
+                <button class="close-btn" onclick="closeAttendeeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <p>Loading attendee list...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 EventHub &bull; Production Ready: Vercel Frontend + Render Backend + Supabase</p>
+    </footer>
+
+    <script>
+        // Resolve backend URL
+        function getApiBase() {
+            let base = window.API_BASE_URL || localStorage.getItem('EVENTHUB_API_URL') || '';
+            // If empty and running on localhost
+            if (!base && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+                base = window.location.port === '5001' ? '' : 'http://127.0.0.1:5001';
+            }
+            return base.replace(/\/+$/, '');
+        }
+
+        let API_BASE = getApiBase();
+        let currentUserId = document.getElementById('userSelect').value;
+        let registeredEventIds = new Set();
+
+        function initBackendBar() {
+            const bar = document.getElementById('backendConfigBar');
+            const input = document.getElementById('backendInput');
+            const status = document.getElementById('backendStatus');
+
+            input.value = API_BASE;
+            if (API_BASE) {
+                status.textContent = 'Connected: ' + API_BASE;
+                document.getElementById('docsLink').href = API_BASE + '/docs';
+            } else {
+                status.textContent = 'Using local / default origin';
+                document.getElementById('docsLink').href = '/docs';
+            }
+        }
+
+        function saveBackendUrl() {
+            const input = document.getElementById('backendInput').value.trim().replace(/\/+$/, '');
+            localStorage.setItem('EVENTHUB_API_URL', input);
+            API_BASE = input;
+            initBackendBar();
+            showToast('Saved Render Backend URL: ' + (API_BASE || 'default'));
+            loadEvents();
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + (isError ? 'toast-error' : 'toast-success');
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3500);
+        }
+
+        function changeActiveUser() {
+            currentUserId = document.getElementById('userSelect').value;
+            showToast('Switched user: ' + currentUserId);
+            loadMyRegistrations(false);
+            loadEvents();
+        }
+
+        function switchTab(tab) {
+            const tabEvents = document.getElementById('tabEvents');
+            const tabMyRegs = document.getElementById('tabMyRegs');
+            const eventsSection = document.getElementById('eventsSection');
+            const myRegsSection = document.getElementById('myRegsSection');
+
+            if (tab === 'events') {
+                tabEvents.classList.add('active');
+                tabMyRegs.classList.remove('active');
+                eventsSection.style.display = 'block';
+                myRegsSection.style.display = 'none';
+                loadEvents();
+            } else {
+                tabEvents.classList.remove('active');
+                tabMyRegs.classList.add('active');
+                eventsSection.style.display = 'none';
+                myRegsSection.style.display = 'block';
+                loadMyRegistrations();
+            }
+        }
+
+        async function loadMyRegistrations(render = true) {
+            try {
+                const res = await fetch(`${API_BASE}/api/me/registrations`, {
+                    headers: { 'X-User-Id': currentUserId }
+                });
+                const data = await res.json();
+                registeredEventIds.clear();
+
+                if (Array.isArray(data)) {
+                    data.forEach(r => registeredEventIds.add(r.event_id));
+                }
+
+                if (!render) return;
+
+                const grid = document.getElementById('myRegsGrid');
+                if (!Array.isArray(data) || data.length === 0) {
+                    grid.innerHTML = '<div class="empty-state">You have not registered for any events yet.</div>';
+                    return;
+                }
+
+                grid.innerHTML = data.map(reg => {
+                    const event = reg.event || {};
+                    return `
+                        <div class="card">
+                            <div class="card-top">
+                                <span class="card-tag">Registered</span>
+                                <h3 class="card-title">${escapeHtml(event.title || 'Untitled Event')}</h3>
+                                <div class="card-meta">
+                                    <span><strong>Event ID:</strong> ${reg.event_id}</span>
+                                    <span><strong>Max Capacity:</strong> ${event.capacity || 'N/A'}</span>
+                                    <span><strong>Registered At:</strong> ${reg.created_at ? new Date(reg.created_at).toLocaleString() : 'Recent'}</span>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                <span class="btn btn-registered">&check; Confirmed Registration</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error(err);
+                if (render) {
+                    document.getElementById('myRegsGrid').innerHTML = '<div class="empty-state">Failed to connect to backend. Please check Render URL.</div>';
+                }
+            }
+        }
+
+        async function loadEvents() {
+            try {
+                await loadMyRegistrations(false);
+
+                const res = await fetch(`${API_BASE}/api/events`);
+                const events = await res.json();
+                const grid = document.getElementById('eventsGrid');
+
+                if (!Array.isArray(events) || events.length === 0) {
+                    grid.innerHTML = '<div class="empty-state">No events available right now.</div>';
+                    return;
+                }
+
+                grid.innerHTML = events.map(ev => {
+                    const isRegistered = registeredEventIds.has(ev.id);
+                    return `
+                        <div class="card">
+                            <div class="card-top">
+                                <span class="card-tag">Tech Event</span>
+                                <h3 class="card-title">${escapeHtml(ev.title)}</h3>
+                                <div class="card-meta">
+                                    <span><strong>Capacity:</strong> ${ev.capacity} attendees</span>
+                                    <span><strong>Organizer:</strong> ${ev.organiser_id.slice(0, 8)}...</span>
+                                    <span><strong>Event ID:</strong> ${ev.id.slice(0, 8)}...</span>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                ${isRegistered 
+                                    ? `<button class="btn btn-registered" disabled>&check; Registered</button>` 
+                                    : `<button class="btn btn-primary" onclick="registerForEvent('${ev.id}')">Register</button>`
+                                }
+                                <button class="btn btn-secondary" onclick="viewAttendees('${ev.id}', '${escapeHtml(ev.title)}')">Attendees</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error(err);
+                document.getElementById('eventsGrid').innerHTML = '<div class="empty-state">Failed to connect to backend. Verify your Render Backend URL above.</div>';
+            }
+        }
+
+        async function registerForEvent(eventId) {
+            try {
+                const res = await fetch(`${API_BASE}/api/registrations`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-Id': currentUserId
+                    },
+                    body: JSON.stringify({ event_id: eventId })
+                });
+                const result = await res.json();
+
+                if (res.status === 201) {
+                    showToast('Successfully registered for the event!');
+                    registeredEventIds.add(eventId);
+                    loadEvents();
+                } else if (res.status === 409) {
+                    showToast(result.error || 'Already registered or event full', true);
+                } else {
+                    showToast(result.error || 'Registration failed', true);
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Network error while registering', true);
+            }
+        }
+
+        async function viewAttendees(eventId, eventTitle) {
+            const modal = document.getElementById('attendeeModal');
+            const modalTitle = document.getElementById('modalEventTitle');
+            const modalBody = document.getElementById('modalBody');
+
+            modalTitle.textContent = 'Attendees &bull; ' + eventTitle;
+            modalBody.innerHTML = '<p class="empty-state">Fetching attendees...</p>';
+            modal.style.display = 'flex';
+
+            try {
+                const res = await fetch(`${API_BASE}/api/events/${eventId}/registrations`, {
+                    headers: { 'X-User-Id': currentUserId }
+                });
+                const data = await res.json();
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    modalBody.innerHTML = '<div class="empty-state">No attendees registered yet for this event.</div>';
+                    return;
+                }
+
+                modalBody.innerHTML = data.map(att => {
+                    const user = att.user || {};
+                    return `
+                        <div class="attendee-item">
+                            <div>
+                                <div class="attendee-email">${escapeHtml(user.email || 'Registered User')}</div>
+                                <div class="attendee-id">ID: ${att.user_id}</div>
+                            </div>
+                            <span class="card-tag" style="margin:0;">${user.role || 'Attendee'}</span>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error(err);
+                modalBody.innerHTML = '<div class="empty-state">Error loading attendee list.</div>';
+            }
+        }
+
+        function closeAttendeeModal() {
+            document.getElementById('attendeeModal').style.display = 'none';
+        }
+
+        function closeModalOnBg(e) {
+            if (e.target.id === 'attendeeModal') {
+                closeAttendeeModal();
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initBackendBar();
+            loadEvents();
+        });
+    </script>
+</body>
+</html>
