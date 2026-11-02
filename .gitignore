@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+.venv/
+
+# Environment Variables & Secrets (STRICT - NEVER COMMIT)
+.env
+.env.local
+.env.*.local
+
+# OS Generated
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# Agent skills cache
+.agents/
+skills-lock.json
