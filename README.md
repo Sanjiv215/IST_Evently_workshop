@@ -127,3 +127,4 @@ This repository uses **Gitleaks** with **Husky** to prevent credentials from eve
 npm install
 ```
 Commits containing secrets or API tokens will be blocked automatically.
+
