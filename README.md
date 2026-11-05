@@ -41,7 +41,7 @@ new1/
 1. In [Vercel](https://vercel.com/), import your repository `Sanjiv215/IST_Evently_workshop`.
 2. **Root Directory**: Select `client` (or leave default `./`).
 3. Under **Environment Variables**, add:
-   - `BACKEND_URL` = `https://<your-render-service>.onrender.com`
+   - `RENDER_BACKEND` = `https://<your-render-service>.onrender.com` *(or `BACKEND_URL`)*
 4. Click **Deploy**.
 
 ---
