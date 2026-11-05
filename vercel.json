@@ -6,10 +6,6 @@
       "destination": "/client/api/[...path]"
     },
     {
-      "source": "/docs",
-      "destination": "/client/api/[...path]"
-    },
-    {
       "source": "/(.*)",
       "destination": "/client/public/$1"
     }
