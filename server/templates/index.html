@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventHub &bull; Event Registration Platform</title>
+    <style>
+        :root {
+            --bg: #0b0f19;
+            --surface: #151e2e;
+            --surface-hover: #1c273c;
+            --border: #243248;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius: 10px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 20px;
+            color: #60a5fa;
+            text-decoration: none;
+        }
+
+        .auth-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-profile-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #0f172a;
+            padding: 6px 12px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .role-pill {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 7px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .role-student { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .role-organizer { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+
+        .nav-links { display: flex; align-items: center; gap: 10px; }
+
+        .tab-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid transparent;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.15s ease;
+        }
+
+        .tab-btn:hover { color: var(--text-main); background: var(--surface-hover); }
+        .tab-btn.active { background: var(--primary); color: white; }
+
+        .docs-link {
+            color: #38bdf8;
+            text-decoration: none;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 7px 12px;
+            border-radius: 6px;
+            border: 1px solid #0369a1;
+            background: rgba(2, 132, 199, 0.1);
+        }
+
+        .docs-link:hover { background: rgba(2, 132, 199, 0.2); }
+
+        main {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 20px;
+            flex: 1;
+            width: 100%;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.2s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .toast-success { background: var(--success); color: white; }
+        .toast-error { background: var(--danger); color: white; }
+
+        .section-header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title { font-size: 22px; font-weight: 700; color: var(--text-main); }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
+
+        .card:hover { transform: translateY(-2px); border-color: #3b82f6; }
+        .card-top { margin-bottom: 16px; }
+
+        .card-tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-title { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+
+        .card-meta {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn {
+            flex: 1;
+            padding: 9px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s ease;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+
+        .btn-secondary {
+            background: #1e293b;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover { background: var(--surface-hover); }
+
+        .btn-outline {
+            background: transparent;
+            color: #38bdf8;
+            border: 1px solid #0284c7;
+        }
+
+        .btn-outline:hover { background: rgba(2, 132, 199, 0.1); }
+
+        .btn-registered {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid #059669;
+            cursor: default;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 200;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            max-width: 480px;
+            width: 100%;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title { font-size: 18px; font-weight: 700; }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .close-btn:hover { color: var(--text-main); }
+        .modal-body { padding: 20px; overflow-y: auto; }
+
+        /* Auth Form Styles */
+        .auth-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .auth-tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .auth-tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            background: #0f172a;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary);
+        }
+
+        .quick-auth-section {
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .quick-auth-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        .quick-btn {
+            width: 100%;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            background: #1e293b;
+            color: #cbd5e1;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .quick-btn:hover {
+            background: #243248;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .attendee-item {
+            padding: 10px 14px;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .attendee-email { font-size: 14px; font-weight: 600; }
+        .attendee-id { font-size: 12px; color: var(--text-muted); font-family: monospace; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            background: var(--surface);
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="/" class="brand">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                EventHub
+            </a>
+
+            <!-- Authentication Controls -->
+            <div class="auth-bar">
+                <div id="unauthControls">
+                    <button class="btn btn-outline" onclick="openAuthModal('login')">Sign In</button>
+                    <button class="btn btn-primary" onclick="openAuthModal('signup')">Sign Up</button>
+                </div>
+
+                <div id="authControls" style="display:none; align-items:center; gap:10px;">
+                    <div class="user-profile-badge">
+                        <span>👤</span>
+                        <span id="userEmailLabel" style="font-weight:600;"></span>
+                        <span class="role-pill" id="userRolePill"></span>
+                    </div>
+                    <button class="btn btn-secondary" onclick="signOut()" style="padding:6px 12px; font-size:12px;">Sign Out</button>
+                </div>
+            </div>
+
+            <div class="nav-links">
+                <button class="tab-btn active" id="tabEvents" onclick="switchTab('events')">Browse Events</button>
+                <button class="tab-btn" id="tabMyRegs" onclick="switchTab('my-regs')">My Registrations</button>
+                <a href="/docs" class="docs-link" target="_blank">API Docs &rarr;</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Tab 1: Browse Events -->
+        <section id="eventsSection">
+            <div class="section-header">
+                <h2 class="section-title">Available Events</h2>
+                <button class="btn btn-secondary" onclick="loadEvents()" style="flex:none;">Refresh Events</button>
+            </div>
+            <div class="events-grid" id="eventsGrid">
+                <div class="empty-state">Loading events...</div>
+            </div>
+        </section>
+
+        <!-- Tab 2: My Registrations -->
+        <section id="myRegsSection" style="display:none;">
+            <div class="section-header">
+                <h2 class="section-title">My Registered Events</h2>
+                <button class="btn btn-secondary" onclick="loadMyRegistrations()" style="flex:none;">Refresh List</button>
+            </div>
+            <div class="events-grid" id="myRegsGrid">
+                <div class="empty-state">Loading registrations...</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Auth Modal (Sign In / Sign Up) -->
+    <div class="modal-overlay" id="authModal" onclick="closeModalOnBg(event, 'authModal')">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="authModalTitle">Sign In</h3>
+                <button class="close-btn" onclick="closeAuthModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="auth-tabs">
+                    <button class="auth-tab-btn active" id="tabLogin" onclick="switchAuthMode('login')">Sign In</button>
+                    <button class="auth-tab-btn" id="tabSignup" onclick="switchAuthMode('signup')">Create Account</button>
+                </div>
+
+                <form id="authForm" onsubmit="handleAuthSubmit(event)">
+                    <div class="form-group">
+                        <label for="authEmail">Email Address</label>
+                        <input type="email" id="authEmail" placeholder="your.name@example.com" required>
+                    </div>
+
+                    <div class="form-group" id="roleGroup" style="display:none;">
+                        <label for="authRole">Account Role</label>
+                        <select id="authRole">
+                            <option value="student">Student (Attendee)</option>
+                            <option value="organizer">Event Organizer</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="authSubmitBtn" style="width:100%; margin-top:8px;">Sign In</button>
+                </form>
+
+                <div class="quick-auth-section">
+                    <div class="quick-auth-title">Quick Demo Sign-In</div>
+                    <button class="quick-btn" onclick="quickLogin('hemant.sharma@intellipaat.com')">
+                        🎓 Student: <strong>hemant.sharma@intellipaat.com</strong>
+                    </button>
+                    <button class="quick-btn" onclick="quickLogin('acid.rollback.demo@example.com')">
+                        🏛️ Organizer: <strong>acid.rollback.demo@example.com</strong>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendee List Modal -->
+    <div class="modal-overlay" id="attendeeModal" onclick="closeModalOnBg(event, 'attendeeModal')">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalEventTitle">Event Attendees</h3>
+                <button class="close-btn" onclick="closeAttendeeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <p>Loading attendee list...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <footer>
+        <p>&copy; 2026 EventHub &bull; Production Architecture: Vercel + Render + Supabase</p>
+    </footer>
+
+    <script>
+        let currentUser = null;
+        let authToken = null;
+        let authMode = 'login';
+        let registeredEventIds = new Set();
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + (isError ? 'toast-error' : 'toast-success');
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3500);
+        }
+
+        // --- AUTHENTICATION STATE & LOGIC ---
+
+        function updateAuthUI() {
+            const unauthDiv = document.getElementById('unauthControls');
+            const authDiv = document.getElementById('authControls');
+            const emailLabel = document.getElementById('userEmailLabel');
+            const rolePill = document.getElementById('userRolePill');
+
+            if (currentUser && authToken) {
+                unauthDiv.style.display = 'none';
+                authDiv.style.display = 'flex';
+                emailLabel.textContent = currentUser.email;
+                rolePill.textContent = currentUser.role;
+                rolePill.className = 'role-pill ' + (currentUser.role === 'organizer' ? 'role-organizer' : 'role-student');
+            } else {
+                unauthDiv.style.display = 'flex';
+                authDiv.style.display = 'none';
+            }
+        }
+
+        function restoreSession() {
+            try {
+                const storedUser = localStorage.getItem('EVENTHUB_USER');
+                const storedToken = localStorage.getItem('EVENTHUB_TOKEN');
+                if (storedUser && storedToken) {
+                    currentUser = JSON.parse(storedUser);
+                    authToken = storedToken;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+            updateAuthUI();
+        }
+
+        function openAuthModal(mode = 'login') {
+            authMode = mode;
+            switchAuthMode(mode);
+            document.getElementById('authModal').style.display = 'flex';
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+        }
+
+        function switchAuthMode(mode) {
+            authMode = mode;
+            const tabLogin = document.getElementById('tabLogin');
+            const tabSignup = document.getElementById('tabSignup');
+            const roleGroup = document.getElementById('roleGroup');
+            const submitBtn = document.getElementById('authSubmitBtn');
+            const modalTitle = document.getElementById('authModalTitle');
+
+            if (mode === 'login') {
+                tabLogin.classList.add('active');
+                tabSignup.classList.remove('active');
+                roleGroup.style.display = 'none';
+                submitBtn.textContent = 'Sign In';
+                modalTitle.textContent = 'Sign In to EventHub';
+            } else {
+                tabSignup.classList.add('active');
+                tabLogin.classList.remove('active');
+                roleGroup.style.display = 'block';
+                submitBtn.textContent = 'Create Account';
+                modalTitle.textContent = 'Join EventHub';
+            }
+        }
+
+        async function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value.trim();
+            const role = document.getElementById('authRole').value;
+
+            const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/signup';
+            const payload = authMode === 'login' ? { email } : { email, role };
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    currentUser = data.user;
+                    authToken = data.token;
+                    localStorage.setItem('EVENTHUB_USER', JSON.stringify(currentUser));
+                    localStorage.setItem('EVENTHUB_TOKEN', authToken);
+                    updateAuthUI();
+                    closeAuthModal();
+                    showToast(`Signed in as ${currentUser.email}`);
+                    loadEvents();
+                    if (document.getElementById('myRegsSection').style.display === 'block') {
+                        loadMyRegistrations();
+                    }
+                } else {
+                    showToast(data.error || 'Authentication failed', true);
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Network error during authentication', true);
+            }
+        }
+
+        async function quickLogin(email) {
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    currentUser = data.user;
+                    authToken = data.token;
+                    localStorage.setItem('EVENTHUB_USER', JSON.stringify(currentUser));
+                    localStorage.setItem('EVENTHUB_TOKEN', authToken);
+                    updateAuthUI();
+                    closeAuthModal();
+                    showToast(`Signed in as ${currentUser.email}`);
+                    loadEvents();
+                    if (document.getElementById('myRegsSection').style.display === 'block') {
+                        loadMyRegistrations();
+                    }
+                } else {
+                    showToast(data.error || 'Sign in failed', true);
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Authentication error', true);
+            }
+        }
+
+        function signOut() {
+            currentUser = null;
+            authToken = null;
+            registeredEventIds.clear();
+            localStorage.removeItem('EVENTHUB_USER');
+            localStorage.removeItem('EVENTHUB_TOKEN');
+            updateAuthUI();
+            showToast('Signed out successfully');
+            switchTab('events');
+            loadEvents();
+        }
+
+        function getAuthHeaders() {
+            const headers = {};
+            if (authToken) {
+                headers['Authorization'] = 'Bearer ' + authToken;
+                headers['X-User-Id'] = currentUser ? currentUser.id : authToken;
+            }
+            return headers;
+        }
+
+        // --- TAB SWITCHING ---
+
+        function switchTab(tab) {
+            const tabEvents = document.getElementById('tabEvents');
+            const tabMyRegs = document.getElementById('tabMyRegs');
+            const eventsSection = document.getElementById('eventsSection');
+            const myRegsSection = document.getElementById('myRegsSection');
+
+            if (tab === 'events') {
+                tabEvents.classList.add('active');
+                tabMyRegs.classList.remove('active');
+                eventsSection.style.display = 'block';
+                myRegsSection.style.display = 'none';
+                loadEvents();
+            } else {
+                if (!currentUser) {
+                    openAuthModal('login');
+                    showToast('Please sign in to view your registrations', true);
+                    return;
+                }
+                tabEvents.classList.remove('active');
+                tabMyRegs.classList.add('active');
+                eventsSection.style.display = 'none';
+                myRegsSection.style.display = 'block';
+                loadMyRegistrations();
+            }
+        }
+
+        // --- EVENTS & REGISTRATIONS ---
+
+        async function loadMyRegistrations(render = true) {
+            if (!currentUser) {
+                registeredEventIds.clear();
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/me/registrations', {
+                    headers: getAuthHeaders()
+                });
+                const data = await res.json();
+                registeredEventIds.clear();
+
+                if (Array.isArray(data)) {
+                    data.forEach(r => registeredEventIds.add(r.event_id));
+                }
+
+                if (!render) return;
+
+                const grid = document.getElementById('myRegsGrid');
+                if (!Array.isArray(data) || data.length === 0) {
+                    grid.innerHTML = '<div class="empty-state">You have not registered for any events yet.</div>';
+                    return;
+                }
+
+                grid.innerHTML = data.map(reg => {
+                    const event = reg.event || {};
+                    return `
+                        <div class="card">
+                            <div class="card-top">
+                                <span class="card-tag">Confirmed</span>
+                                <h3 class="card-title">${escapeHtml(event.title || 'Event')}</h3>
+                                <div class="card-meta">
+                                    <span><strong>Event ID:</strong> ${reg.event_id}</span>
+                                    <span><strong>Max Capacity:</strong> ${event.capacity || 'N/A'} attendees</span>
+                                    <span><strong>Registered:</strong> ${reg.created_at ? new Date(reg.created_at).toLocaleString() : 'Confirmed'}</span>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                <span class="btn btn-registered">&check; Registered</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error(err);
+                if (render) {
+                    document.getElementById('myRegsGrid').innerHTML = '<div class="empty-state">Failed to load registrations.</div>';
+                }
+            }
+        }
+
+        async function loadEvents() {
+            try {
+                if (currentUser) {
+                    await loadMyRegistrations(false);
+                }
+
+                const res = await fetch('/api/events');
+                const events = await res.json();
+                const grid = document.getElementById('eventsGrid');
+
+                if (!Array.isArray(events) || events.length === 0) {
+                    grid.innerHTML = '<div class="empty-state">No events available right now.</div>';
+                    return;
+                }
+
+                grid.innerHTML = events.map(ev => {
+                    const isRegistered = registeredEventIds.has(ev.id);
+                    const isOwner = currentUser && currentUser.id === ev.organiser_id;
+
+                    let actionBtn = '';
+                    if (!currentUser) {
+                        actionBtn = `<button class="btn btn-primary" onclick="openAuthModal('login')">Sign In to Register</button>`;
+                    } else if (isRegistered) {
+                        actionBtn = `<button class="btn btn-registered" disabled>&check; Registered</button>`;
+                    } else {
+                        actionBtn = `<button class="btn btn-primary" onclick="registerForEvent('${ev.id}')">Register</button>`;
+                    }
+
+                    return `
+                        <div class="card">
+                            <div class="card-top">
+                                <span class="card-tag">Tech Event</span>
+                                <h3 class="card-title">${escapeHtml(ev.title)}</h3>
+                                <div class="card-meta">
+                                    <span><strong>Capacity:</strong> ${ev.capacity} attendees</span>
+                                    <span><strong>Organizer:</strong> ${ev.organiser_id.slice(0, 8)}... ${isOwner ? '(You)' : ''}</span>
+                                    <span><strong>Event ID:</strong> ${ev.id.slice(0, 8)}...</span>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                ${actionBtn}
+                                <button class="btn btn-secondary" onclick="viewAttendees('${ev.id}', '${escapeHtml(ev.title)}')">Attendees</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error(err);
+                document.getElementById('eventsGrid').innerHTML = '<div class="empty-state">Failed to load events.</div>';
+            }
+        }
+
+        async function registerForEvent(eventId) {
+            if (!currentUser) {
+                openAuthModal('login');
+                showToast('Please sign in to register', true);
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/registrations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAuthHeaders()
+                    },
+                    body: JSON.stringify({ event_id: eventId })
+                });
+                const result = await res.json();
+
+                if (res.status === 201) {
+                    showToast('Successfully registered for the event!');
+                    registeredEventIds.add(eventId);
+                    loadEvents();
+                } else if (res.status === 409) {
+                    showToast(result.error || 'Already registered or event full', true);
+                } else if (res.status === 401) {
+                    showToast('Session expired. Please sign in again.', true);
+                    openAuthModal('login');
+                } else {
+                    showToast(result.error || 'Registration failed', true);
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Network error while registering', true);
+            }
+        }
+
+        async function viewAttendees(eventId, eventTitle) {
+            if (!currentUser) {
+                openAuthModal('login');
+                showToast('Please sign in to view attendees', true);
+                return;
+            }
+
+            const modal = document.getElementById('attendeeModal');
+            const modalTitle = document.getElementById('modalEventTitle');
+            const modalBody = document.getElementById('modalBody');
+
+            modalTitle.textContent = 'Attendees &bull; ' + eventTitle;
+            modalBody.innerHTML = '<p class="empty-state">Fetching attendees...</p>';
+            modal.style.display = 'flex';
+
+            try {
+                const res = await fetch(`/api/events/${eventId}/registrations`, {
+                    headers: getAuthHeaders()
+                });
+                const data = await res.json();
+
+                if (res.status === 403) {
+                    modalBody.innerHTML = `
+                        <div class="empty-state" style="color:#f59e0b;">
+                            <strong>🔒 Owning Organizer Only</strong>
+                            <p style="margin-top:8px; font-size:13px;">${data.error || 'Only the organizer who created this event can view the attendee list.'}</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (!res.ok) {
+                    modalBody.innerHTML = `<div class="empty-state" style="color:#ef4444;">${data.error || 'Failed to load attendees.'}</div>`;
+                    return;
+                }
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    modalBody.innerHTML = '<div class="empty-state">No attendees registered yet for this event.</div>';
+                    return;
+                }
+
+                modalBody.innerHTML = data.map(att => {
+                    const user = att.user || {};
+                    return `
+                        <div class="attendee-item">
+                            <div>
+                                <div class="attendee-email">${escapeHtml(user.email || 'Registered User')}</div>
+                                <div class="attendee-id">ID: ${att.user_id}</div>
+                            </div>
+                            <span class="card-tag" style="margin:0;">${user.role || 'Student'}</span>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error(err);
+                modalBody.innerHTML = '<div class="empty-state">Error connecting to attendee list.</div>';
+            }
+        }
+
+        function closeAttendeeModal() { document.getElementById('attendeeModal').style.display = 'none'; }
+        function closeModalOnBg(e, modalId) { if (e.target.id === modalId) document.getElementById(modalId).style.display = 'none'; }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            restoreSession();
+            loadEvents();
+        });
+    </script>
+</body>
+</html>

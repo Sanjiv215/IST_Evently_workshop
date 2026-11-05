@@ -1,15 +1,12 @@
 {
-  "name": "new1",
+  "name": "eventhub",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "build": "echo 'Frontend ready'"
+    "dev:server": "cd server && python app.py",
+    "dev:client": "npx serve client/public",
+    "build": "echo 'Build complete'"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "devDependencies": {
     "husky": "^9.1.7"
   }

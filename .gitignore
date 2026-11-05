@@ -10,8 +10,12 @@ env/
 
 # Environment Variables & Secrets (STRICT - NEVER COMMIT)
 .env
-.env.local
-.env.*.local
+.env.*
+*.env
+server/.env
+client/.env
+!.env.example
+!server/.env.example
 
 # OS Generated
 .DS_Store
@@ -19,6 +23,7 @@ Thumbs.db
 
 # Node
 node_modules/
+client/node_modules/
 
 # Agent skills cache
 .agents/

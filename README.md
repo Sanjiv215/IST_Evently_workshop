@@ -1,108 +1,96 @@
-# EventHub &bull; Production Architecture
+# EventHub &bull; Project Directory Structure
 
-A full-stack event registration platform designed for a distributed multi-cloud architecture:
-- **Frontend**: Hosted on **Vercel** (Static UI + Secure Serverless API Proxy)
-- **Backend API**: Hosted on **Render** (Flask + Gunicorn WSGI + CORS)
-- **Database**: Hosted on **Supabase** (PostgreSQL)
+A full-stack event registration platform cleanly divided into `client` (frontend) and `server` (backend).
 
 ---
 
-## Architecture Overview
+## Directory Layout
 
 ```
-                      ┌──────────────────────┐
-                      │    Vercel Frontend   │
-                      │  (No backend visible)│
-                      └──────────┬───────────┘
-                                 │
-                 Requests to     │ /api/* (Same domain)
-                                 ▼
-                      ┌──────────────────────┐
-                      │ Vercel API Proxy     │
-                      │ (Reads BACKEND_URL)  │
-                      └──────────┬───────────┘
-                                 │
-                     HTTP / CORS │ Headers: X-User-Id
-                                 ▼
-                      ┌──────────────────────┐
-                      │    Render Backend    │
-                      │    (Flask / app.py)  │
-                      └──────────┬───────────┘
-                                 │
-                     REST / SSL  │ Supabase Python SDK
-                                 ▼
-                      ┌──────────────────────┐
-                      │  Supabase Database   │
-                      │     (PostgreSQL)     │
-                      └──────────────────────┘
+new1/
+├── client/                     # Frontend Application (Vercel)
+│   ├── public/                 # Static assets & index.html
+│   │   └── index.html
+│   ├── api/                    # Vercel Serverless API Proxy
+│   │   └── [...path].js        # Forwards /api/* to Render backend securely
+│   ├── index.html              # Frontend entrypoint
+│   ├── package.json            # Client package config
+│   ├── vercel.json             # Vercel deployment configuration
+│   └── .vercelignore           # Ignored files for Vercel
+│
+├── server/                     # Backend API Service (Render)
+│   ├── app.py                  # Flask REST API with Supabase
+│   ├── requirements.txt        # Python backend dependencies
+│   ├── render.yaml             # Render deployment configuration
+│   ├── .env.example            # Backend environment variables template
+│   └── templates/              # Server-rendered HTML fallback
+│       └── index.html
+│
+├── .gitignore                  # Git ignore rules (protects all .env files)
+├── .husky/                     # Pre-commit security hook (Gitleaks)
+├── package.json                # Root package configuration
+├── render.yaml                 # Root Render configuration
+├── vercel.json                 # Root Vercel configuration
+└── README.md                   # Project documentation
 ```
 
 ---
 
-## 1. Backend Deployment (Render)
+## 1. Deploying Frontend to Vercel
 
-1. Log in to [Render Dashboard](https://dashboard.render.com/).
-2. Click **New +** &rarr; **Web Service**.
-3. Select your repository: `Sanjiv215/IST_Evently_workshop`.
-4. Configure settings:
-   - **Runtime**: `Python 3`
+1. In [Vercel](https://vercel.com/), import your repository `Sanjiv215/IST_Evently_workshop`.
+2. **Root Directory**: Select `client` (or leave default `./`).
+3. Under **Environment Variables**, add:
+   - `BACKEND_URL` = `https://<your-render-service>.onrender.com`
+4. Click **Deploy**.
+
+---
+
+## 2. Deploying Backend to Render
+
+1. In [Render](https://dashboard.render.com/), create a new **Web Service**.
+2. Select your repository `Sanjiv215/IST_Evently_workshop`.
+3. Configure:
+   - **Root Directory**: `server`
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `gunicorn -w 4 -b 0.0.0.0:$PORT app:app`
-5. In the **Environment Variables** section, add:
-   - `SUPABASE_URL` = *(Your Supabase project URL)*
-   - `SUPABASE_KEY` = *(Your Supabase publishable/anon key)*
+4. Under **Environment Variables**, add:
+   - `SUPABASE_URL` = *(Your Supabase URL)*
+   - `SUPABASE_KEY` = *(Your Supabase Key)*
    - `PYTHON_VERSION` = `3.11.9`
-6. Click **Deploy Web Service** and copy your Render URL (e.g. `https://eventhub-backend.onrender.com`).
-
----
-
-## 2. Frontend Deployment (Vercel)
-
-1. Log in to [Vercel Dashboard](https://vercel.com/).
-2. Click **Add New...** &rarr; **Project**.
-3. Import your repository: `Sanjiv215/IST_Evently_workshop`.
-4. Expand **Environment Variables** and add:
-   - **Key**: `BACKEND_URL`
-   - **Value**: `https://your-backend.onrender.com` *(Replace with your Render URL)*
 5. Click **Deploy**.
-
-> **Note**: No backend URL is displayed in the site. The Vercel serverless proxy securely forwards all `/api/*` and `/docs` requests to the Render URL defined in `BACKEND_URL`.
 
 ---
 
 ## 3. Local Development
 
-### Run Backend
+### Run Backend Server
 ```bash
-source venv/bin/activate
-pip install -r requirements.txt
+# Option 1: From server directory
+cd server
+python app.py
+
+# Option 2: From project root
 python app.py
 ```
-Runs at `http://127.0.0.1:5001`.
+Backend runs at `http://127.0.0.1:5001`.
 
 ### Open Frontend
 Open `http://127.0.0.1:5001/` in your browser.
 
 ---
 
-## API Contract
+## API Endpoints
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/health` | Healthcheck endpoint for Render |
-| `GET` | `/api/events` | Browse all events |
-| `GET` | `/api/events/<id>` | Event details |
-| `POST` | `/api/registrations` | Create registration (receives `X-User-Id` header) |
-| `GET` | `/api/me/registrations` | Current user registrations |
-| `GET` | `/api/events/<id>/registrations` | Attendee list for an event |
-| `GET` | `/docs` | Interactive API documentation |
-
----
-
-## Security
-
-This repository uses **Gitleaks** with **Husky** to prevent credentials from ever being committed:
-```bash
-npm install
-```
-Commits containing secrets or API tokens will be blocked automatically.
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `GET` | `/health` | Service healthcheck | No |
+| `POST` | `/api/auth/login` | Sign in with email | No |
+| `POST` | `/api/auth/signup` | Create user account | No |
+| `GET` | `/api/auth/me` | Current user profile | Yes |
+| `GET` | `/api/events` | Browse events | No |
+| `GET` | `/api/events/<id>` | Event details | No |
+| `POST` | `/api/registrations` | Register for an event | **Yes** (Bearer Token / X-User-Id) |
+| `GET` | `/api/me/registrations` | View my registrations | **Yes** (Bearer Token / X-User-Id) |
+| `GET` | `/api/events/<id>/registrations` | View attendee list | **Yes** (Owning Organizer only) |
+| `GET` | `/docs` | Interactive Swagger API docs | No |

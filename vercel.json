@@ -3,15 +3,15 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api/[...path]"
+      "destination": "/client/api/[...path]"
     },
     {
       "source": "/docs",
-      "destination": "/api/[...path]"
+      "destination": "/client/api/[...path]"
     },
     {
       "source": "/(.*)",
-      "destination": "/public/$1"
+      "destination": "/client/public/$1"
     }
   ]
 }
