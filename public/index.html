@@ -61,34 +61,36 @@
             text-decoration: none;
         }
 
-        .user-selector-bar {
+        .auth-bar {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+        }
+
+        .user-profile-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             background: #0f172a;
             padding: 6px 12px;
             border-radius: var(--radius);
             border: 1px solid var(--border);
-        }
-
-        .user-selector-bar label {
             font-size: 13px;
-            color: var(--text-muted);
-            white-space: nowrap;
         }
 
-        select {
-            background: #1e293b;
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            outline: none;
-            cursor: pointer;
+        .role-pill {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 7px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
         }
 
-        .nav-links { display: flex; gap: 10px; }
+        .role-student { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .role-organizer { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+
+        .nav-links { display: flex; align-items: center; gap: 10px; }
 
         .tab-btn {
             background: transparent;
@@ -108,11 +110,11 @@
         .docs-link {
             color: #38bdf8;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
             display: flex;
             align-items: center;
             gap: 4px;
-            padding: 8px 12px;
+            padding: 7px 12px;
             border-radius: 6px;
             border: 1px solid #0369a1;
             background: rgba(2, 132, 199, 0.1);
@@ -234,6 +236,14 @@
 
         .btn-secondary:hover { background: var(--surface-hover); }
 
+        .btn-outline {
+            background: transparent;
+            color: #38bdf8;
+            border: 1px solid #0284c7;
+        }
+
+        .btn-outline:hover { background: rgba(2, 132, 199, 0.1); }
+
         .btn-registered {
             background: rgba(16, 185, 129, 0.15);
             color: #34d399;
@@ -241,10 +251,11 @@
             cursor: default;
         }
 
+        /* Modal Styles */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.75);
             display: none;
             justify-content: center;
             align-items: center;
@@ -256,7 +267,7 @@
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            max-width: 600px;
+            max-width: 480px;
             width: 100%;
             max-height: 85vh;
             display: flex;
@@ -285,6 +296,90 @@
 
         .close-btn:hover { color: var(--text-main); }
         .modal-body { padding: 20px; overflow-y: auto; }
+
+        /* Auth Form Styles */
+        .auth-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .auth-tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .auth-tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            background: #0f172a;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary);
+        }
+
+        .quick-auth-section {
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .quick-auth-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        .quick-btn {
+            width: 100%;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            background: #1e293b;
+            color: #cbd5e1;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .quick-btn:hover {
+            background: #243248;
+            color: white;
+            border-color: #3b82f6;
+        }
 
         .attendee-item {
             padding: 10px 14px;
@@ -326,30 +421,33 @@
                 EventHub
             </a>
 
-            <div class="user-selector-bar">
-                <label for="userSelect">Active User:</label>
-                <select id="userSelect" onchange="changeActiveUser()">
-                    <option value="7f2e9b9e-d9d8-4712-b6c3-6d2293a73c2a">Hemant Sharma (Student)</option>
-                    <option value="a1a1a1a1-1111-4111-8111-111111111111">Alice Johnson (Student)</option>
-                    <option value="b2b2b2b2-2222-4222-8222-222222222222">Bob Smith (Student)</option>
-                    <option value="c3c3c3c3-3333-4333-8333-333333333333">Charlie Brown (Student)</option>
-                    <option value="d4d4d4d4-4444-4444-8444-444444444444">Diana Prince (Student)</option>
-                    <option value="00eeafd0-1883-4a3f-be54-c54db75b826a">Organizer 1 (acid.rollback.demo)</option>
-                    <option value="e5e5e5e5-5555-4555-8555-555555555555">Organizer 2 (sarah.connor)</option>
-                </select>
+            <!-- Authentication Controls -->
+            <div class="auth-bar">
+                <div id="unauthControls">
+                    <button class="btn btn-outline" onclick="openAuthModal('login')">Sign In</button>
+                    <button class="btn btn-primary" onclick="openAuthModal('signup')">Sign Up</button>
+                </div>
+
+                <div id="authControls" style="display:none; align-items:center; gap:10px;">
+                    <div class="user-profile-badge">
+                        <span>👤</span>
+                        <span id="userEmailLabel" style="font-weight:600;"></span>
+                        <span class="role-pill" id="userRolePill"></span>
+                    </div>
+                    <button class="btn btn-secondary" onclick="signOut()" style="padding:6px 12px; font-size:12px;">Sign Out</button>
+                </div>
             </div>
 
             <div class="nav-links">
                 <button class="tab-btn active" id="tabEvents" onclick="switchTab('events')">Browse Events</button>
                 <button class="tab-btn" id="tabMyRegs" onclick="switchTab('my-regs')">My Registrations</button>
-                <a href="/docs" class="docs-link" target="_blank">
-                    API Docs &rarr;
-                </a>
+                <a href="/docs" class="docs-link" target="_blank">API Docs &rarr;</a>
             </div>
         </div>
     </header>
 
     <main>
+        <!-- Tab 1: Browse Events -->
         <section id="eventsSection">
             <div class="section-header">
                 <h2 class="section-title">Available Events</h2>
@@ -360,6 +458,7 @@
             </div>
         </section>
 
+        <!-- Tab 2: My Registrations -->
         <section id="myRegsSection" style="display:none;">
             <div class="section-header">
                 <h2 class="section-title">My Registered Events</h2>
@@ -371,7 +470,51 @@
         </section>
     </main>
 
-    <div class="modal-overlay" id="attendeeModal" onclick="closeModalOnBg(event)">
+    <!-- Auth Modal (Sign In / Sign Up) -->
+    <div class="modal-overlay" id="authModal" onclick="closeModalOnBg(event, 'authModal')">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="authModalTitle">Sign In</h3>
+                <button class="close-btn" onclick="closeAuthModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="auth-tabs">
+                    <button class="auth-tab-btn active" id="tabLogin" onclick="switchAuthMode('login')">Sign In</button>
+                    <button class="auth-tab-btn" id="tabSignup" onclick="switchAuthMode('signup')">Create Account</button>
+                </div>
+
+                <form id="authForm" onsubmit="handleAuthSubmit(event)">
+                    <div class="form-group">
+                        <label for="authEmail">Email Address</label>
+                        <input type="email" id="authEmail" placeholder="your.name@example.com" required>
+                    </div>
+
+                    <div class="form-group" id="roleGroup" style="display:none;">
+                        <label for="authRole">Account Role</label>
+                        <select id="authRole">
+                            <option value="student">Student (Attendee)</option>
+                            <option value="organizer">Event Organizer</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="authSubmitBtn" style="width:100%; margin-top:8px;">Sign In</button>
+                </form>
+
+                <div class="quick-auth-section">
+                    <div class="quick-auth-title">Quick Demo Sign-In</div>
+                    <button class="quick-btn" onclick="quickLogin('hemant.sharma@intellipaat.com')">
+                        🎓 Student: <strong>hemant.sharma@intellipaat.com</strong>
+                    </button>
+                    <button class="quick-btn" onclick="quickLogin('acid.rollback.demo@example.com')">
+                        🏛️ Organizer: <strong>acid.rollback.demo@example.com</strong>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendee List Modal -->
+    <div class="modal-overlay" id="attendeeModal" onclick="closeModalOnBg(event, 'attendeeModal')">
         <div class="modal">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalEventTitle">Event Attendees</h3>
@@ -390,7 +533,9 @@
     </footer>
 
     <script>
-        let currentUserId = document.getElementById('userSelect').value;
+        let currentUser = null;
+        let authToken = null;
+        let authMode = 'login';
         let registeredEventIds = new Set();
 
         function showToast(message, isError = false) {
@@ -401,12 +546,161 @@
             setTimeout(() => { toast.style.display = 'none'; }, 3500);
         }
 
-        function changeActiveUser() {
-            currentUserId = document.getElementById('userSelect').value;
-            showToast('Switched user: ' + currentUserId);
-            loadMyRegistrations(false);
+        // --- AUTHENTICATION STATE & LOGIC ---
+
+        function updateAuthUI() {
+            const unauthDiv = document.getElementById('unauthControls');
+            const authDiv = document.getElementById('authControls');
+            const emailLabel = document.getElementById('userEmailLabel');
+            const rolePill = document.getElementById('userRolePill');
+
+            if (currentUser && authToken) {
+                unauthDiv.style.display = 'none';
+                authDiv.style.display = 'flex';
+                emailLabel.textContent = currentUser.email;
+                rolePill.textContent = currentUser.role;
+                rolePill.className = 'role-pill ' + (currentUser.role === 'organizer' ? 'role-organizer' : 'role-student');
+            } else {
+                unauthDiv.style.display = 'flex';
+                authDiv.style.display = 'none';
+            }
+        }
+
+        function restoreSession() {
+            try {
+                const storedUser = localStorage.getItem('EVENTHUB_USER');
+                const storedToken = localStorage.getItem('EVENTHUB_TOKEN');
+                if (storedUser && storedToken) {
+                    currentUser = JSON.parse(storedUser);
+                    authToken = storedToken;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+            updateAuthUI();
+        }
+
+        function openAuthModal(mode = 'login') {
+            authMode = mode;
+            switchAuthMode(mode);
+            document.getElementById('authModal').style.display = 'flex';
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+        }
+
+        function switchAuthMode(mode) {
+            authMode = mode;
+            const tabLogin = document.getElementById('tabLogin');
+            const tabSignup = document.getElementById('tabSignup');
+            const roleGroup = document.getElementById('roleGroup');
+            const submitBtn = document.getElementById('authSubmitBtn');
+            const modalTitle = document.getElementById('authModalTitle');
+
+            if (mode === 'login') {
+                tabLogin.classList.add('active');
+                tabSignup.classList.remove('active');
+                roleGroup.style.display = 'none';
+                submitBtn.textContent = 'Sign In';
+                modalTitle.textContent = 'Sign In to EventHub';
+            } else {
+                tabSignup.classList.add('active');
+                tabLogin.classList.remove('active');
+                roleGroup.style.display = 'block';
+                submitBtn.textContent = 'Create Account';
+                modalTitle.textContent = 'Join EventHub';
+            }
+        }
+
+        async function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value.trim();
+            const role = document.getElementById('authRole').value;
+
+            const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/signup';
+            const payload = authMode === 'login' ? { email } : { email, role };
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    currentUser = data.user;
+                    authToken = data.token;
+                    localStorage.setItem('EVENTHUB_USER', JSON.stringify(currentUser));
+                    localStorage.setItem('EVENTHUB_TOKEN', authToken);
+                    updateAuthUI();
+                    closeAuthModal();
+                    showToast(`Signed in as ${currentUser.email}`);
+                    loadEvents();
+                    if (document.getElementById('myRegsSection').style.display === 'block') {
+                        loadMyRegistrations();
+                    }
+                } else {
+                    showToast(data.error || 'Authentication failed', true);
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Network error during authentication', true);
+            }
+        }
+
+        async function quickLogin(email) {
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    currentUser = data.user;
+                    authToken = data.token;
+                    localStorage.setItem('EVENTHUB_USER', JSON.stringify(currentUser));
+                    localStorage.setItem('EVENTHUB_TOKEN', authToken);
+                    updateAuthUI();
+                    closeAuthModal();
+                    showToast(`Signed in as ${currentUser.email}`);
+                    loadEvents();
+                    if (document.getElementById('myRegsSection').style.display === 'block') {
+                        loadMyRegistrations();
+                    }
+                } else {
+                    showToast(data.error || 'Sign in failed', true);
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Authentication error', true);
+            }
+        }
+
+        function signOut() {
+            currentUser = null;
+            authToken = null;
+            registeredEventIds.clear();
+            localStorage.removeItem('EVENTHUB_USER');
+            localStorage.removeItem('EVENTHUB_TOKEN');
+            updateAuthUI();
+            showToast('Signed out successfully');
+            switchTab('events');
             loadEvents();
         }
+
+        function getAuthHeaders() {
+            const headers = {};
+            if (authToken) {
+                headers['Authorization'] = 'Bearer ' + authToken;
+                headers['X-User-Id'] = currentUser ? currentUser.id : authToken;
+            }
+            return headers;
+        }
+
+        // --- TAB SWITCHING ---
 
         function switchTab(tab) {
             const tabEvents = document.getElementById('tabEvents');
@@ -421,6 +715,11 @@
                 myRegsSection.style.display = 'none';
                 loadEvents();
             } else {
+                if (!currentUser) {
+                    openAuthModal('login');
+                    showToast('Please sign in to view your registrations', true);
+                    return;
+                }
                 tabEvents.classList.remove('active');
                 tabMyRegs.classList.add('active');
                 eventsSection.style.display = 'none';
@@ -429,10 +728,17 @@
             }
         }
 
+        // --- EVENTS & REGISTRATIONS ---
+
         async function loadMyRegistrations(render = true) {
+            if (!currentUser) {
+                registeredEventIds.clear();
+                return;
+            }
+
             try {
                 const res = await fetch('/api/me/registrations', {
-                    headers: { 'X-User-Id': currentUserId }
+                    headers: getAuthHeaders()
                 });
                 const data = await res.json();
                 registeredEventIds.clear();
@@ -454,16 +760,16 @@
                     return `
                         <div class="card">
                             <div class="card-top">
-                                <span class="card-tag">Registered</span>
-                                <h3 class="card-title">${escapeHtml(event.title || 'Untitled Event')}</h3>
+                                <span class="card-tag">Confirmed</span>
+                                <h3 class="card-title">${escapeHtml(event.title || 'Event')}</h3>
                                 <div class="card-meta">
                                     <span><strong>Event ID:</strong> ${reg.event_id}</span>
-                                    <span><strong>Max Capacity:</strong> ${event.capacity || 'N/A'}</span>
-                                    <span><strong>Registered At:</strong> ${reg.created_at ? new Date(reg.created_at).toLocaleString() : 'Recent'}</span>
+                                    <span><strong>Max Capacity:</strong> ${event.capacity || 'N/A'} attendees</span>
+                                    <span><strong>Registered:</strong> ${reg.created_at ? new Date(reg.created_at).toLocaleString() : 'Confirmed'}</span>
                                 </div>
                             </div>
                             <div class="card-actions">
-                                <span class="btn btn-registered">&check; Confirmed Registration</span>
+                                <span class="btn btn-registered">&check; Registered</span>
                             </div>
                         </div>
                     `;
@@ -478,7 +784,9 @@
 
         async function loadEvents() {
             try {
-                await loadMyRegistrations(false);
+                if (currentUser) {
+                    await loadMyRegistrations(false);
+                }
 
                 const res = await fetch('/api/events');
                 const events = await res.json();
@@ -491,6 +799,17 @@
 
                 grid.innerHTML = events.map(ev => {
                     const isRegistered = registeredEventIds.has(ev.id);
+                    const isOwner = currentUser && currentUser.id === ev.organiser_id;
+
+                    let actionBtn = '';
+                    if (!currentUser) {
+                        actionBtn = `<button class="btn btn-primary" onclick="openAuthModal('login')">Sign In to Register</button>`;
+                    } else if (isRegistered) {
+                        actionBtn = `<button class="btn btn-registered" disabled>&check; Registered</button>`;
+                    } else {
+                        actionBtn = `<button class="btn btn-primary" onclick="registerForEvent('${ev.id}')">Register</button>`;
+                    }
+
                     return `
                         <div class="card">
                             <div class="card-top">
@@ -498,15 +817,12 @@
                                 <h3 class="card-title">${escapeHtml(ev.title)}</h3>
                                 <div class="card-meta">
                                     <span><strong>Capacity:</strong> ${ev.capacity} attendees</span>
-                                    <span><strong>Organizer:</strong> ${ev.organiser_id.slice(0, 8)}...</span>
+                                    <span><strong>Organizer:</strong> ${ev.organiser_id.slice(0, 8)}... ${isOwner ? '(You)' : ''}</span>
                                     <span><strong>Event ID:</strong> ${ev.id.slice(0, 8)}...</span>
                                 </div>
                             </div>
                             <div class="card-actions">
-                                ${isRegistered 
-                                    ? `<button class="btn btn-registered" disabled>&check; Registered</button>` 
-                                    : `<button class="btn btn-primary" onclick="registerForEvent('${ev.id}')">Register</button>`
-                                }
+                                ${actionBtn}
                                 <button class="btn btn-secondary" onclick="viewAttendees('${ev.id}', '${escapeHtml(ev.title)}')">Attendees</button>
                             </div>
                         </div>
@@ -519,12 +835,18 @@
         }
 
         async function registerForEvent(eventId) {
+            if (!currentUser) {
+                openAuthModal('login');
+                showToast('Please sign in to register', true);
+                return;
+            }
+
             try {
                 const res = await fetch('/api/registrations', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-User-Id': currentUserId
+                        ...getAuthHeaders()
                     },
                     body: JSON.stringify({ event_id: eventId })
                 });
@@ -536,6 +858,9 @@
                     loadEvents();
                 } else if (res.status === 409) {
                     showToast(result.error || 'Already registered or event full', true);
+                } else if (res.status === 401) {
+                    showToast('Session expired. Please sign in again.', true);
+                    openAuthModal('login');
                 } else {
                     showToast(result.error || 'Registration failed', true);
                 }
@@ -546,6 +871,12 @@
         }
 
         async function viewAttendees(eventId, eventTitle) {
+            if (!currentUser) {
+                openAuthModal('login');
+                showToast('Please sign in to view attendees', true);
+                return;
+            }
+
             const modal = document.getElementById('attendeeModal');
             const modalTitle = document.getElementById('modalEventTitle');
             const modalBody = document.getElementById('modalBody');
@@ -556,9 +887,24 @@
 
             try {
                 const res = await fetch(`/api/events/${eventId}/registrations`, {
-                    headers: { 'X-User-Id': currentUserId }
+                    headers: getAuthHeaders()
                 });
                 const data = await res.json();
+
+                if (res.status === 403) {
+                    modalBody.innerHTML = `
+                        <div class="empty-state" style="color:#f59e0b;">
+                            <strong>🔒 Owning Organizer Only</strong>
+                            <p style="margin-top:8px; font-size:13px;">${data.error || 'Only the organizer who created this event can view the attendee list.'}</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (!res.ok) {
+                    modalBody.innerHTML = `<div class="empty-state" style="color:#ef4444;">${data.error || 'Failed to load attendees.'}</div>`;
+                    return;
+                }
 
                 if (!Array.isArray(data) || data.length === 0) {
                     modalBody.innerHTML = '<div class="empty-state">No attendees registered yet for this event.</div>';
@@ -573,18 +919,18 @@
                                 <div class="attendee-email">${escapeHtml(user.email || 'Registered User')}</div>
                                 <div class="attendee-id">ID: ${att.user_id}</div>
                             </div>
-                            <span class="card-tag" style="margin:0;">${user.role || 'Attendee'}</span>
+                            <span class="card-tag" style="margin:0;">${user.role || 'Student'}</span>
                         </div>
                     `;
                 }).join('');
             } catch (err) {
                 console.error(err);
-                modalBody.innerHTML = '<div class="empty-state">Error loading attendee list.</div>';
+                modalBody.innerHTML = '<div class="empty-state">Error connecting to attendee list.</div>';
             }
         }
 
         function closeAttendeeModal() { document.getElementById('attendeeModal').style.display = 'none'; }
-        function closeModalOnBg(e) { if (e.target.id === 'attendeeModal') closeAttendeeModal(); }
+        function closeModalOnBg(e, modalId) { if (e.target.id === modalId) document.getElementById(modalId).style.display = 'none'; }
 
         function escapeHtml(str) {
             if (!str) return '';
@@ -596,7 +942,10 @@
                 .replace(/'/g, "&#039;");
         }
 
-        window.addEventListener('DOMContentLoaded', () => { loadEvents(); });
+        window.addEventListener('DOMContentLoaded', () => {
+            restoreSession();
+            loadEvents();
+        });
     </script>
 </body>
 </html>
